@@ -1,0 +1,9 @@
+{
+  "account" : "CREATE TABLE `Account` (`id`	INTEGER NOT NULL UNIQUE,`balance` REAL NOT NULL DEFAULT 0.0,`customerDni`	INTEGER NOT NULL,FOREIGN KEY(`customerDni`) REFERENCES `Customer`(`dni`),PRIMARY KEY(`id`));",
+  "customer" : "CREATE TABLE `Customer` (`dni`	INTEGER NOT NULL UNIQUE,`name`	TEXT NOT NULL DEFAULT 'Unknow',PRIMARY KEY(`dni`));",
+  "transaction" : "CREATE TABLE `Transaction` (`number`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `amount`	REAL DEFAULT 0.0, `time`	TEXT, `accountId`	INTEGER NOT NULL, `vehicleDomain`	TEXT NOT NULL,`turnDate`	TEXT NOT NULL, `turnNumber`	INTEGER NOT NULL, FOREIGN KEY(`vehicleDomain`) REFERENCES `Vehicle`(`domain`), FOREIGN KEY(`turnNumber`) REFERENCES `Turn`(`number`), FOREIGN KEY(`turnDate`) REFERENCES `Turn`(`date`), FOREIGN KEY(`accountId`) REFERENCES `Account`(`id`));",
+  "turn" : "CREATE TABLE `Turn` (`date`	TEXT NOT NULL,`number`	INTEGER NOT NULL,PRIMARY KEY(`date`,`number`));",
+  "vehicle" : "CREATE TABLE `Vehicle` (`domain`	TEXT NOT NULL UNIQUE,`manufacturer`	TEXT DEFAULT 'Unknow',`version`	TEXT DEFAULT 'Unknow',`year`	INTEGER DEFAULT 2018,`customerDni`	INTEGER,PRIMARY KEY(`domain`),FOREIGN KEY(`customerDni`) REFERENCES `Customer`(`dni`));",
+  "transactionType" : "CREATE TABLE `TransactionType` (`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,`type`	TEXT NOT NULL);",
+  "turnNumber" : "CREATE TABLE `TurnNumber` (`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,`number`	INTEGER NOT NULL);"
+}

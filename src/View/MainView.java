@@ -1,8 +1,12 @@
 package View;
 
+import Service.FileManager;
+import Service.SqliteManager;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,6 +24,7 @@ public class MainView {
     private JTable customersTable;
     private JScrollPane tableScroll;
     private DefaultTableModel customersModel;
+    private SqliteManager dbManager;
 
     public MainView() {
         this.customersModel = new DefaultTableModel(new Object[]{"Nombre","Saldo"},0 );
@@ -27,6 +32,8 @@ public class MainView {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm☺");
         this.turnInfo.setText(dateFormat.format(time));
         this.initComponents();
+        dbManager = SqliteManager.sqliteManagerComapnion.getInstance();
+        dbManager.createDb(FileManager.fileManagerCompanion.getInstance().readTextFile("src/Data/CurrentAccountsLa24Tables.db.sql"));
     }
 
     private void initComponents(){

@@ -1,19 +1,45 @@
 package Service
 
+import com.sun.xml.internal.fastinfoset.util.StringArray
 import sun.rmi.runtime.Log
 import java.sql.Connection
 import java.sql.DriverManager
+import java.sql.PreparedStatement
 import java.sql.SQLException
 import java.util.logging.Logger
 
 class SqliteManager private constructor
 (
         var connection: Connection? = null,
-        var dbName: String = "/Data/La24Accounts.sqlite",
-        var stringConnection: String = "jdbc:sqlite ${dbName}",
+        //revisar la rutapath to './Data/La24Accounts.sqlite': 'C:\Users\PABLO\IdeaProjects\CuentaCorrienteLa24\.\Data' does not exist
+        var dbName: String = "La24Accounts.sqlite",
+        var stringConnection: String = "jdbc:sqlite:${dbName}",
         var controller: String = "org.sqlite.JDBC"
 )
 {
+    init {
+        print("Creating DB...")
+    }
+
+    fun createDb(query : String){
+        instance.connect()
+        /**
+         * split the string extracted from sql file on individual statements in order to execute one by one
+         * */
+        val statements: List<String> = query.split(";")
+        try {
+            for (st in statements){
+                instance.connection!!.createStatement().execute(st)
+            }
+        }
+        catch (ex: SQLException){
+            print(ex.message)
+        }
+        finally {
+            instance.closeConnection()
+        }
+    }
+
     private object holder { val INSTANCE = SqliteManager()}
 
     companion object sqliteManagerComapnion{
@@ -26,7 +52,8 @@ class SqliteManager private constructor
             return true
         }
         catch (ex: ClassNotFoundException){
-            System.out.println(ex.message)
+            println("Hay problemas con el driver")
+            println(ex.message)
             return false
         }
     }
@@ -39,6 +66,15 @@ class SqliteManager private constructor
             catch (ex: SQLException){
                 System.out.println(ex.message)
             }
+        }
+    }
+
+    fun closeConnection(){
+        try {
+            instance.connection!!.close()
+        }
+        catch (ex: SQLException){
+            print(ex.message)
         }
     }
 
