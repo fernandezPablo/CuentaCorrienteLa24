@@ -1,13 +1,18 @@
 package View
 
+import Model.Customer
+import Presenter.MainPresenter
 import java.awt.*
 import java.awt.event.ActionEvent
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.swing.*
 import javax.swing.table.DefaultTableModel
-import javax.swing.table.TableModel
+import kotlin.collections.ArrayList
 
-class MainView : JFrame("Cuentas Corriente - LA 24") {
+class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView{
 
+    val presenter : MainPresenter = MainPresenter(this)
     val mainPanel : JPanel = JPanel(GridBagLayout())
     val menuBar : JMenuBar = JMenuBar()
     val menuCustomersManagment : JMenu= JMenu("Gestion de Clientes")
@@ -19,13 +24,21 @@ class MainView : JFrame("Cuentas Corriente - LA 24") {
     val titleLabel: JLabel = JLabel("SISTEMA CUENTA CORRIENTE - LA 24")
     val customersTable : JTable = JTable()
     val scrollTable : JScrollPane = JScrollPane(this.customersTable)
-    val columnsTableCustomers : Array<String> = arrayOf("NOMBRE","SALDO")
-    val customersModel : TableModel = DefaultTableModel(columnsTableCustomers,2)
-    val infoLabel : JLabel = JLabel("Turno n: x - dd/mm/aa")
+    val customersModel : DefaultTableModel = this.customersTable.model as DefaultTableModel
+    var turnNumber : Int = 2
+    var date : Date = Date()
+    val infoLabel : JLabel = JLabel()
+    val changeTurnButton : JButton = JButton("CAMBIAR TURNO")
 
 
     init{
+        val option = JOptionPane.showOptionDialog(this,"¿Que turno esta abierto en este momento?",
+                "Seleccion de turno",JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE,
+                null, arrayOf("NOCHE","MAÑANA","TARDE"),"MAÑANA")
+        this.turnNumber = option + 1
+        this.infoLabel.text = "Turno n: ${this.turnNumber} - ${SimpleDateFormat("dd/MM/yy").format(this.date)}"
         this.initComponents()
+        this.presenter.initDataView()
     }
 
     fun initComponents(){
@@ -62,11 +75,24 @@ class MainView : JFrame("Cuentas Corriente - LA 24") {
         gbc.insets = Insets(30,30,30,30)
 
         this.customersTable.background = Color(194,194,194)
-        this.customersTable.model = this.customersModel
         this.customersTable.rowHeight = 30
+        this.customersModel.addColumn("NOMBRE")
+        this.customersModel.addColumn("SALDO")
         this.mainPanel.add(this.scrollTable,gbc)
 
         gbc.gridx = 0
+        gbc.gridy = 5
+        gbc.gridwidth = 1
+        gbc.weighty = 0.0
+        gbc.gridheight = 1
+        gbc.anchor = GridBagConstraints.BELOW_BASELINE_LEADING
+        gbc.fill = GridBagConstraints.NONE
+        gbc.insets = Insets(0,30,30,0)
+
+        this.changeTurnButton.addActionListener { e -> changeTurn(e) }
+        this.mainPanel.add(this.changeTurnButton,gbc)
+
+        gbc.gridx = 1
         gbc.gridy = 5
         gbc.gridwidth = 1
         gbc.weighty = 0.0
@@ -79,6 +105,28 @@ class MainView : JFrame("Cuentas Corriente - LA 24") {
         this.mainPanel.add(this.infoLabel,gbc)
 
         this.pack()
+    }
+
+    private fun changeTurn(e: ActionEvent) {
+        val option = JOptionPane.showOptionDialog(this,
+                "Esta a punto de cambiar de turno ¿Esta seguro? ",
+                "Cambio de turno",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                arrayOf("Aceptar","Cancelar"),
+                "Cancelar")
+        if(option == 0){
+            this.turnNumber = when (this.turnNumber){
+                1 -> 2
+                2 -> 3
+                3 -> 1
+                else -> this.turnNumber
+            }
+            this.infoLabel.text = "Turno n: ${this.turnNumber} - ${SimpleDateFormat("dd/MM/yy").format(this.date)}"
+        }
+
+
     }
 
     fun generateMenuBar(): JMenuBar{
@@ -99,7 +147,12 @@ class MainView : JFrame("Cuentas Corriente - LA 24") {
         this.dispose()
     }
 
-
     private fun showMessage() = print("Hello...")
+
+    override fun fillCustomersTable(customers: ArrayList<Customer>) {
+        for (customer in customers){
+            this.customersModel.addRow(arrayOf(customer.name,customer.account.balance))
+        }
+    }
 
 }

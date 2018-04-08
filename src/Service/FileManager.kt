@@ -1,6 +1,7 @@
 package Service
 
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.InputStream
 
 class FileManager {
@@ -12,11 +13,16 @@ class FileManager {
     }
 
     fun readTextFile(path: String): String {
-        val inputStream: InputStream = File(path).inputStream()
-
-        val inputString = inputStream.bufferedReader().use { it.readText() }
-        println(inputString)
-        return inputString
+        try {
+            val inputStream: InputStream = File(path).inputStream()
+            val inputString = inputStream.bufferedReader().use { it.readText() }
+            println(inputString)
+            return inputString
+        }
+        catch (ex: FileNotFoundException){
+            print(ex.message)
+        }
+        return ""
     }
 
 
