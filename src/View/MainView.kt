@@ -137,7 +137,7 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView{
         this.menuCustomersManagment.add(this.itemMenuNewCustomer)
         this.menuCustomersManagment.add(this.itemMenuEditCustomer)
         this.menuCustomersManagment.add(this.itemMenuDeleteCustomer)
-        this.itemMenuNewCustomer.addActionListener{e -> showMessage()}
+        this.itemMenuNewCustomer.addActionListener{e -> openNewCustomerDialog(e)}
         return this.menuBar
     }
 
@@ -148,6 +148,10 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView{
     }
 
     private fun showMessage() = print("Hello...")
+
+    private fun openNewCustomerDialog(e: ActionEvent){
+        val newCustomerDialog = NewCustomerView(this,"NUEVO CLIENTE")
+    }
 
     override fun fillCustomersTable(customers: ArrayList<Customer>) {
         for (customer in customers){
