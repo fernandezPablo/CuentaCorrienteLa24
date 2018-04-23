@@ -47,10 +47,10 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
     }
 
     private fun initComponents(){
-        this.setSize(600,600)
-        this.minimumSize = Dimension(600,600)
+        this.setSize(600,500)
+        this.minimumSize = Dimension(600,500)
         this.isVisible = true
-        this.setLocationRelativeTo(owner)
+        this.setLocation(owner.x,owner.y)
         this.layout = FlowLayout()
         this.mainPanel.background = Color(196,196,196)
         this.contentPane = mainPanel
