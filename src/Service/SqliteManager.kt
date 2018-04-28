@@ -3,6 +3,7 @@ package Service
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
+import kotlin.system.exitProcess
 
 class SqliteManager private constructor
 (
@@ -48,8 +49,7 @@ class SqliteManager private constructor
             return true
         }
         catch (ex: ClassNotFoundException){
-            println("Hay problemas con el driver")
-            println(ex.message)
+            println("NO SE ENCONTRO EL DRIVER!")
             return false
         }
     }
@@ -62,6 +62,9 @@ class SqliteManager private constructor
             catch (ex: SQLException){
                 System.out.println(ex.message)
             }
+        }
+        else{
+            exitProcess(1)
         }
     }
 

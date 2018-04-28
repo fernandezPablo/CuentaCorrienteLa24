@@ -1,28 +1,15 @@
 package View
 
+import javafx.scene.layout.BorderStroke
 import java.awt.*
-import java.awt.event.FocusEvent
-import java.awt.event.FocusListener
-import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
-import java.text.Format
+import java.awt.event.*
 import javax.swing.*
+import javax.swing.border.Border
 import javax.swing.border.TitledBorder
 import javax.swing.table.DefaultTableModel
 
-class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), FocusListener
+class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), FocusListener, INewCustomerView
 {
-    override fun focusLost(e: FocusEvent?) {
-        if (e?.source == this.vehicleYearTextField ){
-            println(this.vehicleYearTextField.value)
-        }
-    }
-
-    override fun focusGained(e: FocusEvent?) {
-        if(e?.source == this.vehicleYearTextField){
-            this.vehicleYearTextField.text = ""
-        }
-    }
 
     private val mainPanel : JPanel = JPanel(GridBagLayout())
     private val title : JLabel = JLabel("REGISTRO DE NUEVOS CLIENTES")
@@ -44,6 +31,64 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
     init {
         this.initComponents()
         this.vehicleYearTextField.addFocusListener(this)
+        this.cancelButton.addActionListener {
+            closeJDialog(it)
+        }
+        this.addVehicleButton.addActionListener {
+            addVehicleToTable(it)
+        }
+    }
+
+    private fun addVehicleToTable(event: ActionEvent?) {
+
+        if(this.validateVehicleData()) {
+            this.vehiclesTableModel.addRow(
+                    arrayOf(
+                            this.getVehicleDomain(),
+                            this.getVehicleManufacturer(),
+                            this.getVehicleVersion(),
+                            this.getVehicleYear().toString()
+                    )
+            )
+            this.refreshVehicleForm()
+            this.vehicleDomainTextField.requestFocus()
+        }
+    }
+
+    private fun validateVehicleData() : Boolean {
+       if(!this.getVehicleDomain().equals("")){
+            if(this.vehicleManufacturerTextField.text.equals("")){
+                this.vehicleManufacturerTextField.text = "UNKNOWN MANUFACTURER"
+            }
+            if(this.vehicleVersionTextField.text.equals("")){
+                this.vehicleVersionTextField.text = "UNKNOWN VERSION"
+            }
+       }
+       else{
+           JOptionPane.showMessageDialog(
+                   this,
+                   "Para agregar un vehiculo debe indicar el dominio del mismo",
+                   "ATENCION!",JOptionPane.ERROR_MESSAGE
+           )
+           this.vehicleDomainTextField.border = TitledBorder(
+                   BorderFactory.createLineBorder(Color.RED),
+                   "DOMINIO")
+           this.vehicleDomainTextField.requestFocus()
+           return false
+       }
+        return true
+    }
+
+    private fun refreshVehicleForm(){
+        this.vehicleDomainTextField.text = ""
+        this.vehicleManufacturerTextField.text = ""
+        this.vehicleVersionTextField.text = ""
+        this.vehicleYearTextField.text = ""
+        this.vehicleDomainTextField.border = TitledBorder("DOMINIO")
+    }
+
+    private fun closeJDialog(event: ActionEvent?) {
+        this.dispose()
     }
 
     private fun initComponents(){
@@ -227,5 +272,64 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
         this.pack()
     }
 
+    override fun focusLost(e: FocusEvent?) {
+        if (e?.source == this.vehicleYearTextField ){
+            println(this.vehicleYearTextField.value)
+        }
+    }
+
+    override fun focusGained(e: FocusEvent?) {
+        if(e?.source == this.vehicleYearTextField){
+            this.vehicleYearTextField.text = ""
+        }
+    }
+
+
+    override fun getCustomerName(): String = this.customerNameTextField.text
+
+    override fun setCustomerName(name: String) {
+        this.customerNameTextField.text = name
+    }
+
+    override fun getCustomerDni(): Long = this.customerDniTextField.text.toLong()
+
+    override fun setCustomerDni(dni: Long) {
+        this.customerDniTextField.text = dni.toString()
+    }
+
+    override fun getVehicleDomain(): String = this.vehicleDomainTextField.text
+
+    override fun setVehicleDomain(domain: String) {
+        this.vehicleDomainTextField.text = domain
+    }
+
+    override fun getVehicleManufacturer(): String = this.vehicleManufacturerTextField.text
+
+    override fun setVehicleManufacturer(manufacturer: String) {
+        this.vehicleManufacturerTextField.text = manufacturer
+    }
+
+    override fun getVehicleVersion(): String = this.vehicleVersionTextField.text
+
+    override fun setVehicleVersion(version: String) {
+        this.vehicleVersionTextField.text = version
+    }
+
+    override fun getVehicleYear(): Int {
+        var separateString = this.vehicleYearTextField.text.split(".")
+        var year = 1991 //DEFAULT YEAR
+        try {
+            year = (separateString[0] + separateString[1]).toInt()
+        }
+        catch (exception : java.lang.IndexOutOfBoundsException){
+            println("NUMERO MENOR A 1000")
+        }
+
+        return year
+    }
+
+    override fun setVehicleYear(year: Int) {
+        this.vehicleYearTextField.text = year.toString()
+    }
 
 }
