@@ -1,10 +1,11 @@
 package View
 
-import javafx.scene.layout.BorderStroke
+import Model.Vehicle
+import Presenter.NewCustomerPresenter
 import java.awt.*
 import java.awt.event.*
+import java.util.logging.Logger
 import javax.swing.*
-import javax.swing.border.Border
 import javax.swing.border.TitledBorder
 import javax.swing.table.DefaultTableModel
 
@@ -27,6 +28,7 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
     private val vehiclesTable : JTable = JTable()
     private val vehiclesTableScroll : JScrollPane = JScrollPane(this.vehiclesTable)
     private val vehiclesTableModel : DefaultTableModel = this.vehiclesTable.model as DefaultTableModel
+    private val presenter : NewCustomerPresenter = NewCustomerPresenter(this)
 
     init {
         this.initComponents()
@@ -36,6 +38,9 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
         }
         this.addVehicleButton.addActionListener {
             addVehicleToTable(it)
+        }
+        this.registerButton.addActionListener {
+            registerCustomer(it)
         }
     }
 
@@ -53,6 +58,16 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
             this.refreshVehicleForm()
             this.vehicleDomainTextField.requestFocus()
         }
+    }
+
+    private fun validateCustomerData() : Boolean {
+        if(this.customerNameTextField.text.equals("")){
+          return false
+        }
+        if(this.customerDniTextField.text.equals("")){
+           return false
+        }
+        return true
     }
 
     private fun validateVehicleData() : Boolean {
@@ -85,6 +100,16 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
         this.vehicleVersionTextField.text = ""
         this.vehicleYearTextField.text = ""
         this.vehicleDomainTextField.border = TitledBorder("DOMINIO")
+    }
+
+    private fun registerCustomer(event: ActionEvent?){
+        if(!this.validateCustomerData()){
+            JOptionPane.showMessageDialog(this,"Debe completar todos los datos del cliente " +
+                    "antes de continuar","ATENCION!",JOptionPane.ERROR_MESSAGE)
+            return
+        }
+        this.presenter.registerCustomer()
+        this.dispose()
     }
 
     private fun closeJDialog(event: ActionEvent?) {
@@ -291,7 +316,14 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
         this.customerNameTextField.text = name
     }
 
-    override fun getCustomerDni(): Long = this.customerDniTextField.text.toLong()
+    override fun getCustomerDni(): Long {
+        try {
+            return this.deleteDot(this.customerDniTextField.text,"1").toLong()
+        }
+        catch (exception : NumberFormatException){
+            return 1
+        }
+    }
 
     override fun setCustomerDni(dni: Long) {
         this.customerDniTextField.text = dni.toString()
@@ -316,20 +348,54 @@ class NewCustomerView(owner: Frame?, title: String?) : JDialog(owner, title), Fo
     }
 
     override fun getVehicleYear(): Int {
-        var separateString = this.vehicleYearTextField.text.split(".")
-        var year = 1991 //DEFAULT YEAR
         try {
-            year = (separateString[0] + separateString[1]).toInt()
+            return this.deleteDot(this.vehicleYearTextField.text,"1991").toInt()
         }
-        catch (exception : java.lang.IndexOutOfBoundsException){
-            println("NUMERO MENOR A 1000")
+        catch (exception : NumberFormatException){
+            return 1991
         }
-
-        return year
     }
 
     override fun setVehicleYear(year: Int) {
         this.vehicleYearTextField.text = year.toString()
+    }
+
+    override fun getVehiclesData(): ArrayList<Vehicle> {
+        var vehicles : ArrayList<Vehicle> = ArrayList()
+        for(i in 0..this.vehiclesTable.rowCount-1){
+            vehicles.add(
+                    Vehicle(this.vehiclesTable.getValueAt(i,0).toString(),
+                    this.vehiclesTable.getValueAt(i,1).toString(),
+                    this.vehiclesTable.getValueAt(i,2).toString(),
+                    this.vehiclesTable.getValueAt(i,3).toString().toInt())
+            )
+        }
+        return vehicles
+    }
+
+
+    override fun showMessage(message: String, title : String, messageType : String) {
+        when(messageType){
+            "ERROR" -> JOptionPane.showMessageDialog(this,message,title,JOptionPane.ERROR_MESSAGE)
+            "WARNING" -> JOptionPane.showMessageDialog(this,message,title,JOptionPane.WARNING_MESSAGE)
+            "INFO" -> JOptionPane.showMessageDialog(this,message,title,JOptionPane.INFORMATION_MESSAGE)
+            else -> Logger.getLogger("ErrorLogger").info("ERROR AL ELEGIR OPCION DE MENSAJE")
+        }
+    }
+
+    fun deleteDot(initString : String, defaultValue : String) : String{
+        var separateString = initString.split(".")
+        var result = ""
+        try {
+            for(string in separateString)
+            {
+                result += string
+            }
+        }
+        catch (exception : java.lang.IndexOutOfBoundsException){
+           return defaultValue
+        }
+        return result
     }
 
 }

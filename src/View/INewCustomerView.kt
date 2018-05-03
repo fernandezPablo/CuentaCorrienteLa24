@@ -1,5 +1,6 @@
 package View
 
+import Model.Vehicle
 import javax.print.attribute.standard.PrinterMoreInfoManufacturer
 
 interface INewCustomerView {
@@ -16,5 +17,7 @@ interface INewCustomerView {
     fun setVehicleVersion(version : String) : Unit
     fun getVehicleYear() : Int
     fun setVehicleYear(year : Int) : Unit
+    fun getVehiclesData() : ArrayList<Vehicle>
+    fun showMessage(message : String,title : String, messageType: String) : Unit
 
 }
