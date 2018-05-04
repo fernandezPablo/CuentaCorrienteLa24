@@ -179,9 +179,7 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener{
         println("Bye bye...")
         this.dispose()
     }
-
-    private fun showMessage() = print("Hello...")
-
+    
     private fun openNewCustomerDialog(e: ActionEvent){
         val newCustomerDialog = NewCustomerView(this,"NUEVO CLIENTE")
     }
