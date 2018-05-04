@@ -4,13 +4,45 @@ import Model.Customer
 import Presenter.MainPresenter
 import java.awt.*
 import java.awt.event.ActionEvent
+import java.awt.event.WindowEvent
+import java.awt.event.WindowListener
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.*
 import javax.swing.table.DefaultTableModel
 import kotlin.collections.ArrayList
 
-class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView{
+class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener{
+
+    override fun windowDeiconified(e: WindowEvent?) {
+        println("Window Deiconified")
+    }
+
+    override fun windowClosing(e: WindowEvent?) {
+        println("Window Closing")
+    }
+
+    override fun windowClosed(e: WindowEvent?) {
+        println("Window Closed")
+    }
+
+    override fun windowActivated(e: WindowEvent?) {
+        println("Window Activated")
+        this.clearCustomerTable()
+        this.presenter.initDataView()
+    }
+
+    override fun windowDeactivated(e: WindowEvent?) {
+        println("Window Deactivated")
+    }
+
+    override fun windowOpened(e: WindowEvent?) {
+        println("Window Opened")
+    }
+
+    override fun windowIconified(e: WindowEvent?) {
+        println("Window Iconified")
+    }
 
     val presenter : MainPresenter = MainPresenter(this)
     val mainPanel : JPanel = JPanel(GridBagLayout())
@@ -39,6 +71,7 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView{
         this.infoLabel.text = "Turno n: ${this.turnNumber} - ${SimpleDateFormat("dd/MM/yy").format(this.date)}"
         this.initComponents()
         this.presenter.initDataView()
+        this.addWindowListener(this)
     }
 
     fun initComponents(){
@@ -157,6 +190,14 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView{
         for (customer in customers){
             this.customersModel.addRow(arrayOf(customer.name,customer.account.balance))
         }
+    }
+
+    private fun clearCustomerTable(){
+        var row = this.customersModel.rowCount-1
+        do {
+            this.customersModel.removeRow(row)
+            row --
+        } while (row >= 0)
     }
 
 }
