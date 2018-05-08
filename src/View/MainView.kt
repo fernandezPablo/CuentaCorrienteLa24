@@ -3,16 +3,37 @@ package View
 import Model.Customer
 import Presenter.MainPresenter
 import java.awt.*
-import java.awt.event.ActionEvent
-import java.awt.event.WindowEvent
-import java.awt.event.WindowListener
+import java.awt.event.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.*
 import javax.swing.table.DefaultTableModel
 import kotlin.collections.ArrayList
 
-class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener{
+class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener, MouseListener {
+
+    override fun mouseReleased(e: MouseEvent?) {
+    }
+
+    override fun mouseEntered(e: MouseEvent?) {
+    }
+
+    override fun mouseClicked(e: MouseEvent?) {
+        if (e != null) {
+            if(e.source == this.customersTable){
+                var row = this.customersTable.selectedRow
+                AccountView(this,"Cuenta Corriente de ${this.customersModel.getValueAt(row,1)}",
+                        this.customersModel.getValueAt(row,0).toString().toLong()).isVisible = true
+            }
+        }
+    }
+
+    override fun mouseExited(e: MouseEvent?) {
+    }
+
+    override fun mousePressed(e: MouseEvent?) {
+    }
+
 
     override fun windowDeiconified(e: WindowEvent?) {
         println("Window Deiconified")
@@ -72,6 +93,7 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener{
         this.initComponents()
         this.presenter.initDataView()
         this.addWindowListener(this)
+        this.customersTable.addMouseListener(this)
     }
 
     fun initComponents(){
@@ -109,6 +131,7 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener{
 
         this.customersTable.background = Color(194,194,194)
         this.customersTable.rowHeight = 30
+        this.customersModel.addColumn("DNI")
         this.customersModel.addColumn("NOMBRE")
         this.customersModel.addColumn("SALDO")
         this.mainPanel.add(this.scrollTable,gbc)
@@ -186,7 +209,7 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener{
 
     override fun fillCustomersTable(customers: ArrayList<Customer>) {
         for (customer in customers){
-            this.customersModel.addRow(arrayOf(customer.name,customer.account.balance))
+            this.customersModel.addRow(arrayOf(customer.dni,customer.name,customer.account.balance))
         }
     }
 

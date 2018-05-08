@@ -2,6 +2,7 @@ package Presenter
 
 import Model.Account
 import Model.AccountDAO
+import Model.Customer
 import Model.CustomerDAO
 import View.IMainView
 
@@ -16,4 +17,5 @@ class MainPresenter (private val view: IMainView){
         }
         this.view.fillCustomersTable(customers)
     }
+
 }

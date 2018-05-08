@@ -50,5 +50,29 @@ class CustomerDAO {
 
         return "OK"
     }
+
+    fun getCustomer(dni : Long) : Customer{
+        var customer : Customer = Customer()
+        val sqliteManager = SqliteManager.instance
+
+        sqliteManager.connect()
+
+        val preparedStatement : PreparedStatement = sqliteManager.connection!!.
+                prepareStatement("SELECT * FROM Customer WHERE Customer.dni = ? LIMIT 1")
+        try {
+            preparedStatement.setLong(1,dni)
+            val resultSet = preparedStatement.executeQuery()
+            while (resultSet.next()){
+                customer = Customer(resultSet.getLong(0),resultSet.getString(1))
+            }
+        }
+        catch (ex : SQLException){
+            print(ex.message)
+        }
+        finally {
+            sqliteManager.closeConnection()
+        }
+        return customer
+    }
     
 }
