@@ -23,15 +23,19 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes />
+    <loaded-nodes>
+      <connection connection-id="2f2ddf01-5189-4d93-b495-dc436ea7bb4d">
+        <schema name="main" object-types="table, view" />
+      </connection>
+    </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="2eb6f69f-12c4-4bc4-851f-0560ef0c7e58">
-      <console name="La24Accounts" type="STANDARD"><![CDATA[select "Vehicle".domain, "Vehicle".manufacturer, "Vehicle".version, "Vehicle".year, "Customer".name as "Owner" from "Vehicle" join "Customer" ON "Vehicle"."customerDni" = "Customer".dni;]]></console>
+    <connection id="2f2ddf01-5189-4d93-b495-dc436ea7bb4d">
+      <console name="Connection" type="STANDARD"><![CDATA[select * from "Transaction";]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
-    <connection id="2eb6f69f-12c4-4bc4-851f-0560ef0c7e58" />
+    <connection id="2f2ddf01-5189-4d93-b495-dc436ea7bb4d" />
   </component>
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />
@@ -56,9 +60,9 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="2eb6f69f-12c4-4bc4-851f-0560ef0c7e58" active="true">
+      <connection id="2f2ddf01-5189-4d93-b495-dc436ea7bb4d" active="true">
         <database>
-          <name value="La24Accounts" />
+          <name value="Connection" />
           <description value="" />
           <database-type value="SQLITE" />
           <config-type value="BASIC" />

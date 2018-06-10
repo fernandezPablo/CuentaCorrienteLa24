@@ -9,8 +9,7 @@ class NewCustomerPresenter(private val view : INewCustomerView) {
 
     fun registerCustomer(){
         val customer = Customer(this.view.getCustomerDni(),this.view.getCustomerName())
-        val accessToCustomerObject = CustomerDAO()
-        val messageCustomerTransaction = accessToCustomerObject.writeCustomer(customer)
+        val messageCustomerTransaction = CustomerDAO.writeCustomer(customer)
         if(!messageCustomerTransaction.equals("OK")){
             this.view.showMessage(messageCustomerTransaction,"ERROR AL REGISTRAR CLIENTE","ERROR")
             return

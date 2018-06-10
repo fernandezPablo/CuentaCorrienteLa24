@@ -5,7 +5,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
-class CustomerDAO {
+object CustomerDAO {
 
     fun readAllCustomers(): ArrayList<Customer>{
 
@@ -21,8 +21,9 @@ class CustomerDAO {
             customers.add(Customer(resultSet.getLong("dni"),resultSet.getString("name")))
         }
 
-        sqliteManager.closeConnection()
+        preparedStatement.close()
         resultSet.close()
+        sqliteManager.closeConnection()
 
         return customers
     }
@@ -31,20 +32,21 @@ class CustomerDAO {
         val sqliteManager = SqliteManager.instance
         sqliteManager.connect()
 
-        var preparedStatement = sqliteManager.connection!!.prepareStatement("INSERT INTO Customer(dni,name) VALUES(?,?)")
+        var preparedStatementCustomer = sqliteManager.connection!!.prepareStatement("INSERT INTO Customer(dni,name) VALUES(?,?)")
 
         try {
-            preparedStatement.setLong(1,customer.dni)
-            preparedStatement.setString(2,customer.name)
+            preparedStatementCustomer.setLong(1,customer.dni)
+            preparedStatementCustomer.setString(2,customer.name)
 
-            preparedStatement.execute()
-
-            sqliteManager.closeConnection()
+            preparedStatementCustomer.execute()
+            AccountDAO.createAccountForCustomer(customerDni = customer.dni)
         }
         catch (exception : SQLException){
+            sqliteManager.closeConnection()
             return exception.message.toString()
         }
         finally {
+            preparedStatementCustomer.close()
             sqliteManager.closeConnection()
         }
 
@@ -52,24 +54,25 @@ class CustomerDAO {
     }
 
     fun getCustomer(dni : Long) : Customer{
-        var customer : Customer = Customer()
+        var customer = Customer()
         val sqliteManager = SqliteManager.instance
 
         sqliteManager.connect()
 
-        val preparedStatement : PreparedStatement = sqliteManager.connection!!.
+        val preparedStatement = sqliteManager.connection!!.
                 prepareStatement("SELECT * FROM Customer WHERE Customer.dni = ? LIMIT 1")
         try {
             preparedStatement.setLong(1,dni)
-            val resultSet = preparedStatement.executeQuery()
+            val resultSet : ResultSet = preparedStatement.executeQuery()
             while (resultSet.next()){
-                customer = Customer(resultSet.getLong(0),resultSet.getString(1))
+                customer = Customer(resultSet.getLong("dni"),resultSet.getString("name"))
             }
         }
         catch (ex : SQLException){
             print(ex.message)
         }
         finally {
+            preparedStatement.close()
             sqliteManager.closeConnection()
         }
         return customer

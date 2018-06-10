@@ -1,6 +1,8 @@
 package View
 
 import Model.Customer
+import Model.Turn
+import Model.TurnNumber
 import Presenter.MainPresenter
 import java.awt.*
 import java.awt.event.*
@@ -11,59 +13,6 @@ import javax.swing.table.DefaultTableModel
 import kotlin.collections.ArrayList
 
 class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener, MouseListener {
-
-    override fun mouseReleased(e: MouseEvent?) {
-    }
-
-    override fun mouseEntered(e: MouseEvent?) {
-    }
-
-    override fun mouseClicked(e: MouseEvent?) {
-        if (e != null) {
-            if(e.source == this.customersTable){
-                var row = this.customersTable.selectedRow
-                AccountView(this,"Cuenta Corriente de ${this.customersModel.getValueAt(row,1)}",
-                        this.customersModel.getValueAt(row,0).toString().toLong()).isVisible = true
-            }
-        }
-    }
-
-    override fun mouseExited(e: MouseEvent?) {
-    }
-
-    override fun mousePressed(e: MouseEvent?) {
-    }
-
-
-    override fun windowDeiconified(e: WindowEvent?) {
-        println("Window Deiconified")
-    }
-
-    override fun windowClosing(e: WindowEvent?) {
-        println("Window Closing")
-    }
-
-    override fun windowClosed(e: WindowEvent?) {
-        println("Window Closed")
-    }
-
-    override fun windowActivated(e: WindowEvent?) {
-        println("Window Activated")
-        this.clearCustomerTable()
-        this.presenter.initDataView()
-    }
-
-    override fun windowDeactivated(e: WindowEvent?) {
-        println("Window Deactivated")
-    }
-
-    override fun windowOpened(e: WindowEvent?) {
-        println("Window Opened")
-    }
-
-    override fun windowIconified(e: WindowEvent?) {
-        println("Window Iconified")
-    }
 
     val presenter : MainPresenter = MainPresenter(this)
     val mainPanel : JPanel = JPanel(GridBagLayout())
@@ -78,8 +27,7 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener,
     val customersTable : JTable = JTable()
     val scrollTable : JScrollPane = JScrollPane(this.customersTable)
     val customersModel : DefaultTableModel = this.customersTable.model as DefaultTableModel
-    var turnNumber : Int = 2
-    var date : Date = Date()
+    var turn : Turn = Turn()
     val infoLabel : JLabel = JLabel()
     val changeTurnButton : JButton = JButton("CAMBIAR TURNO")
 
@@ -88,8 +36,7 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener,
         val option = JOptionPane.showOptionDialog(this,"¿Que turno esta abierto en este momento?",
                 "Seleccion de turno",JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE,
                 null, arrayOf("NOCHE","MAÑANA","TARDE"),"MAÑANA")
-        this.turnNumber = option + 1
-        this.infoLabel.text = "Turno n: ${this.turnNumber} - ${SimpleDateFormat("dd/MM/yy").format(this.date)}"
+        this.openTurn(option + 1)
         this.initComponents()
         this.presenter.initDataView()
         this.addWindowListener(this)
@@ -173,15 +120,14 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener,
                 arrayOf("Aceptar","Cancelar"),
                 "Cancelar")
         if(option == 0){
-            this.turnNumber = when (this.turnNumber){
-                1 -> 2
-                2 -> 3
-                3 -> 1
-                else -> this.turnNumber
+            this.turn.number = when (this.turn.number){
+                TurnNumber.ONE -> TurnNumber.TWO
+                TurnNumber.TWO -> TurnNumber.THREE
+                TurnNumber.THREE -> TurnNumber.ONE
+                else -> this.turn.number
             }
-            this.infoLabel.text = "Turno n: ${this.turnNumber} - ${SimpleDateFormat("dd/MM/yy").format(this.date)}"
+            this.openTurn(this.turn.number.number)
         }
-
 
     }
 
@@ -215,10 +161,65 @@ class MainView : JFrame("Cuentas Corriente - LA 24"), IMainView, WindowListener,
 
     private fun clearCustomerTable(){
         var row = this.customersModel.rowCount-1
-        do {
-            this.customersModel.removeRow(row)
-            row --
-        } while (row >= 0)
+        if(row >= 0){
+            do {
+                this.customersModel.removeRow(row)
+                row --
+            } while (row >= 0)
+        }
     }
 
+    private fun openTurn(nTurn : Int){
+        this.turn = this.presenter.newTurn(nTurn)
+        this.infoLabel.text = "Turno n: ${this.turn.number.number} - ${SimpleDateFormat("dd/MM/yy").format(this.turn.date)}"
+    }
+
+    override fun mouseReleased(e: MouseEvent?) {
+    }
+
+    override fun mouseEntered(e: MouseEvent?) {
+    }
+
+    override fun mouseClicked(e: MouseEvent?) {
+        if (e != null) {
+            if(e.source == this.customersTable){
+                var row = this.customersTable.selectedRow
+                AccountView(this,"Cuenta Corriente de ${this.customersModel.getValueAt(row,1)}",
+                        this.customersModel.getValueAt(row,0).toString().toLong(),this.turn).isVisible = true
+            }
+        }
+    }
+
+    override fun mouseExited(e: MouseEvent?) {
+    }
+
+    override fun mousePressed(e: MouseEvent?) {
+    }
+
+
+    override fun windowDeiconified(e: WindowEvent?) {
+
+    }
+
+    override fun windowClosing(e: WindowEvent?) {
+
+    }
+
+    override fun windowClosed(e: WindowEvent?) {
+
+    }
+
+    override fun windowActivated(e: WindowEvent?) {
+        this.clearCustomerTable()
+        this.presenter.initDataView()
+    }
+
+    override fun windowDeactivated(e: WindowEvent?) {
+    }
+
+    override fun windowOpened(e: WindowEvent?) {
+    }
+
+    override fun windowIconified(e: WindowEvent?) {
+    }
 }
