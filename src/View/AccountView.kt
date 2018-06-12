@@ -40,6 +40,13 @@ class AccountView(owner: JFrame?, title : String?, customerDni : Long, turn : Tu
         this.depositButton.addActionListener {
             this.balanceDeposit(it)
         }
+        this.chargeButton.addActionListener {
+            this.charge(it)
+        }
+    }
+
+    private fun charge(it: ActionEvent?) {
+
     }
 
     private fun balanceDeposit(event : ActionEvent) {
